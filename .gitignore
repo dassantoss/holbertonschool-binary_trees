@@ -9,7 +9,7 @@ Examples/
 *.log
 
 # Ignorar el ejecutable
-exe0
+*exe*
 
 # Ignora funcion para imprimir
 binary_tree_print.c
