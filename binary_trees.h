@@ -20,6 +20,18 @@ typedef struct binary_tree_s
 	struct binary_tree_s *right;
 } binary_tree_t;
 
+/**
+ * struct queue_s - Queue node structure
+ * @node: Pointer to the binary tree node
+ * @next: Pointer to the next node in the queue
+ */
+typedef struct queue_s
+{
+    const binary_tree_t *node;
+    struct queue_s *next;
+} queue_t;
+
+
 /*Binary Search Tree*/
 typedef struct binary_tree_s bst_t;
 
@@ -103,5 +115,9 @@ bst_t *bst_search(const bst_t *tree, int value);
 bst_t *bst_remove(bst_t *root, int value);
 int binary_tree_is_avl(const binary_tree_t *tree);
 avl_t *avl_insert(avl_t **tree, int value);
+
+/*Others*/
+void enqueue(queue_t **queue, const binary_tree_t *node);
+void dequeue(queue_t **queue);
 
 #endif

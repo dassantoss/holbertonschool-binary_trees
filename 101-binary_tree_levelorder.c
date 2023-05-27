@@ -1,5 +1,5 @@
 #include "binary_trees.h"
-#include "queue.h"
+#include <stdlib.h>
 
 /**
  * binary_tree_levelorder - Traverses a binary tree using level-order traversal
@@ -14,27 +14,73 @@
 void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
 {
 	queue_t *queue = NULL;
+	const binary_tree_t *node = NULL;
 
 	if (tree == NULL || func == NULL)
 		return;
 
-	queue = queue_create();
+	queue = malloc(sizeof(queue_t));
 	if (queue == NULL)
 		return;
 
-	queue_push(queue, (void *)tree);
+	queue->node = tree;
+	queue->next = NULL;
 
-	while (!queue_is_empty(queue))
+	while (queue != NULL)
 	{
-		const binary_tree_t *node = (binary_tree_t *)queue_pop(queue);
-
+		node = queue->node;
 		func(node->n);
 
 		if (node->left != NULL)
-			queue_push(queue, (void *)node->left);
+			enqueue(&queue, node->left);
 		if (node->right != NULL)
-			queue_push(queue, (void *)node->right);
+			enqueue(&queue, node->right);
+
+		dequeue(&queue);
 	}
 
-	queue_delete(queue);
+	free(queue);
+}
+
+/**
+ * enqueue - Enqueues a node in the queue
+ * @queue: Double pointer to the queue
+ * @node: Pointer to the node to enqueue
+ */
+void enqueue(queue_t **queue, const binary_tree_t *node)
+{
+	queue_t *new_node = malloc(sizeof(queue_t));
+	queue_t *last = *queue;
+
+	if (new_node == NULL)
+		return;
+
+	new_node->node = node;
+	new_node->next = NULL;
+
+	if (*queue == NULL)
+	{
+		*queue = new_node;
+		return;
+	}
+
+	while (last->next != NULL)
+		last = last->next;
+
+	last->next = new_node;
+}
+
+/**
+ * dequeue - Dequeues the front node from the queue
+ * @queue: Double pointer to the queue
+ */
+void dequeue(queue_t **queue)
+{
+	queue_t *temp = *queue;
+
+	if (*queue == NULL)
+		return;
+
+	*queue = (*queue)->next;
+	free(temp);
 }
