@@ -1,67 +1,86 @@
 #include "binary_trees.h"
+#include <stdlib.h>
 
 /**
- * recursive_height - measures the height of a binary tree
+ * binary_tree_levelorder - Traverses a binary tree using level-order traversal
+ * @tree: Pointer to the root node of the tree to traverse
+ * @func: Pointer to a function to call for each node
  *
- * @tree: tree root
- * Return: height
- */
-size_t recursive_height(const binary_tree_t *tree)
-{
-	size_t left = 0;
-	size_t right = 0;
-
-	if (tree == NULL)
-		return (0);
-
-	left = recursive_height(tree->left);
-	right = recursive_height(tree->right);
-
-	if (left > right)
-		return (left + 1);
-
-	return (right + 1);
-}
-
-/**
- * print_level - prints nodes at the same level
- *
- * @tree: tree root
- * @level: level node
- * @func: pointer to a function
- * Return: no return
- */
-void print_level(const binary_tree_t *tree, int level, void (*func)(int))
-{
-	if (tree == NULL)
-		return;
-
-	if (level == 1)
-		func(tree->n);
-	else if (level > 1)
-	{
-		print_level(tree->left, level - 1, func);
-		print_level(tree->right, level - 1, func);
-	}
-}
-
-/**
- * binary_tree_levelorder - prints data in level-order traversal
- *
- * @tree: tree root
- * @func: pointer to a function
- * Return: no return
+ * Description: This function traverses the binary tree in level-order,
+ * visiting each node at each level from left to right.
+ * The `func` function is called for each visited node, passing the value
+ * of the node as a parameter.
  */
 void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
 {
-	size_t height;
-	size_t i;
+	queue_t *queue = NULL;
+	const binary_tree_t *node = NULL;
 
 	if (tree == NULL || func == NULL)
 		return;
 
-	height = recursive_height(tree);
+	queue = malloc(sizeof(queue_t));
+	if (queue == NULL)
+		return;
 
-	for (i = 1; i <= height; i++)
-		print_level(tree, i, func);
+	queue->node = tree;
+	queue->next = NULL;
+
+	while (queue != NULL)
+	{
+		node = queue->node;
+		func(node->n);
+
+		if (node->left != NULL)
+			enqueue(&queue, node->left);
+		if (node->right != NULL)
+			enqueue(&queue, node->right);
+
+		dequeue(&queue);
+	}
+
+	free(queue);
+}
+
+/**
+ * enqueue - Enqueues a node in the queue
+ * @queue: Double pointer to the queue
+ * @node: Pointer to the node to enqueue
+ */
+void enqueue(queue_t **queue, const binary_tree_t *node)
+{
+	queue_t *new_node = malloc(sizeof(queue_t));
+	queue_t *last = *queue;
+
+	if (new_node == NULL)
+		return;
+
+	new_node->node = node;
+	new_node->next = NULL;
+
+	if (*queue == NULL)
+	{
+		*queue = new_node;
+		return;
+	}
+
+	while (last->next != NULL)
+		last = last->next;
+
+	last->next = new_node;
+}
+
+/**
+ * dequeue - Dequeues the front node from the queue
+ * @queue: Double pointer to the queue
+ */
+void dequeue(queue_t **queue)
+{
+	queue_t *temp = *queue;
+
+	if (*queue == NULL)
+		return;
+
+	*queue = (*queue)->next;
+	free(temp);
 }
